@@ -50,16 +50,13 @@ def amount_for_performances(performances, plays) -> float:
 
 def statement_for_performance(perf, plays) -> str:
     play = get_play_for_performance(perf, plays)
-    return f' {play["name"]}: {format_as_dollars(amount_for_performance(perf, plays)/100)} ({perf["audience"]} seats)\n'
+    return f' {play["name"]}: {format_as_dollars(amount_for_performance(perf, plays)/100)} ({perf["audience"]} seats)'
 
 
 def statement(invoice, plays):
-    result = f'Statement for {invoice["customer"]}\n'
+    results = [f'Statement for {invoice["customer"]}']
     performances = invoice["performances"]
-
-    for perf in performances:
-        result += statement_for_performance(perf, plays)
-
-    result += f"Amount owed is {format_as_dollars(amount_for_performances(performances, plays)/100)}\n"
-    result += f"You earned {volume_credits_for_performances(performances, plays)} credits\n"
-    return result
+    results.extend(statement_for_performance(perf, plays) for perf in performances)
+    results.append(f"Amount owed is {format_as_dollars(amount_for_performances(performances, plays)/100)}")
+    results.append(f"You earned {volume_credits_for_performances(performances, plays)} credits\n")
+    return "\n".join(results)
