@@ -39,11 +39,13 @@ def statement(invoice, plays):
                 volume_credits += math.floor(perf["audience"] / 5)
         return volume_credits
 
+    def amount_for_performances() -> float:
+        return sum(amount_for_performance(perf) for perf in invoice["performances"])
+
     for perf in invoice["performances"]:
         play = plays[perf["playID"]]
         result += f' {play["name"]}: {format_as_dollars(amount_for_performance(perf)/100)} ({perf["audience"]} seats)\n'
-        total_amount += amount_for_performance(perf)
 
-    result += f"Amount owed is {format_as_dollars(total_amount/100)}\n"
+    result += f"Amount owed is {format_as_dollars(amount_for_performances()/100)}\n"
     result += f"You earned {volume_credits_for_performances()} credits\n"
     return result
