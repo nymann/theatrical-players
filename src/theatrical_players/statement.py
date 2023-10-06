@@ -3,7 +3,6 @@ import math
 
 def statement(invoice, plays):
     total_amount = 0
-    volume_credits = 0
     result = f'Statement for {invoice["customer"]}\n'
 
     def format_as_dollars(amount):
@@ -31,16 +30,21 @@ def statement(invoice, plays):
             return amount_for_comedy(perf)
         raise ValueError(f'unknown type: {play["type"]}')
 
+    def volume_credits_for_performances() -> float:
+        volume_credits = 0
+        for perf in invoice["performances"]:
+            play = plays[perf["playID"]]
+            volume_credits += max(perf["audience"] - 30, 0)
+            if "comedy" == play["type"]:
+                volume_credits += math.floor(perf["audience"] / 5)
+        return volume_credits
+
     for perf in invoice["performances"]:
         play = plays[perf["playID"]]
         this_amount = amount_for_performance(perf)
-
-        volume_credits += max(perf["audience"] - 30, 0)
-        if "comedy" == play["type"]:
-            volume_credits += math.floor(perf["audience"] / 5)
         result += f' {play["name"]}: {format_as_dollars(this_amount/100)} ({perf["audience"]} seats)\n'
         total_amount += this_amount
 
     result += f"Amount owed is {format_as_dollars(total_amount/100)}\n"
-    result += f"You earned {volume_credits} credits\n"
+    result += f"You earned {volume_credits_for_performances()} credits\n"
     return result
