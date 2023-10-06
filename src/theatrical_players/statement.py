@@ -1,24 +1,10 @@
 import math
 
+from theatrical_players.price_calculator import PerformancePriceCalculator
+
 
 def format_as_dollars(amount):
     return f"${amount:0,.2f}"
-
-
-def amount_for_tragedy(perf) -> float:
-    this_amount = 40000
-    if perf["audience"] > 30:
-        this_amount += 1000 * (perf["audience"] - 30)
-    return this_amount
-
-
-def amount_for_comedy(perf) -> float:
-    this_amount = 30000
-    if perf["audience"] > 20:
-        this_amount += 10000 + 500 * (perf["audience"] - 20)
-
-    this_amount += 300 * perf["audience"]
-    return this_amount
 
 
 def get_play_for_performance(performance, plays):
@@ -35,28 +21,17 @@ def volume_credits_for_performances(performances, plays) -> float:
     return volume_credits
 
 
-def amount_for_performance(perf, plays) -> float:
-    play = get_play_for_performance(perf, plays)
-    if play["type"] == "tragedy":
-        return amount_for_tragedy(perf)
-    if play["type"] == "comedy":
-        return amount_for_comedy(perf)
-    raise ValueError(f'unknown type: {play["type"]}')
-
-
-def amount_for_performances(performances, plays) -> float:
-    return sum(amount_for_performance(perf, plays) for perf in performances)
-
-
 def statement_for_performance(perf, plays) -> str:
+    calculator = PerformancePriceCalculator(plays)
     play = get_play_for_performance(perf, plays)
-    return f' {play["name"]}: {format_as_dollars(amount_for_performance(perf, plays)/100)} ({perf["audience"]} seats)'
+    return f' {play["name"]}: {format_as_dollars(calculator.calculate_price(perf)/100)} ({perf["audience"]} seats)'
 
 
 def statement(invoice, plays):
     results = [f'Statement for {invoice["customer"]}']
     performances = invoice["performances"]
+    price_calculator = PerformancePriceCalculator(plays)
     results.extend(statement_for_performance(perf, plays) for perf in performances)
-    results.append(f"Amount owed is {format_as_dollars(amount_for_performances(performances, plays)/100)}")
+    results.append(f"Amount owed is {format_as_dollars(price_calculator.total(performances)/100)}")
     results.append(f"You earned {volume_credits_for_performances(performances, plays)} credits\n")
     return "\n".join(results)
