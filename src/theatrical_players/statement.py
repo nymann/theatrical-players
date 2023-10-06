@@ -9,12 +9,16 @@ def statement(invoice, plays):
     def format_as_dollars(amount):
         return f"${amount:0,.2f}"
 
+    def amount_for_tragedy(perf) -> float:
+        this_amount = 40000
+        if perf["audience"] > 30:
+            this_amount += 1000 * (perf["audience"] - 30)
+        return this_amount
+
     for perf in invoice["performances"]:
         play = plays[perf["playID"]]
         if play["type"] == "tragedy":
-            this_amount = 40000
-            if perf["audience"] > 30:
-                this_amount += 1000 * (perf["audience"] - 30)
+            this_amount = amount_for_tragedy(perf)
         elif play["type"] == "comedy":
             this_amount = 30000
             if perf["audience"] > 20:
