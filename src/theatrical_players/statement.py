@@ -2,7 +2,6 @@ import math
 
 
 def statement(invoice, plays):
-    total_amount = 0
     result = f'Statement for {invoice["customer"]}\n'
 
     def format_as_dollars(amount):
