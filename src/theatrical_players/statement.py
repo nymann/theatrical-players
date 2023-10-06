@@ -23,14 +23,17 @@ def statement(invoice, plays):
         this_amount += 300 * perf["audience"]
         return this_amount
 
-    for perf in invoice["performances"]:
+    def amount_for_performance(perf) -> float:
         play = plays[perf["playID"]]
         if play["type"] == "tragedy":
-            this_amount = amount_for_tragedy(perf)
-        elif play["type"] == "comedy":
-            this_amount = amount_for_comedy(perf)
-        else:
-            raise ValueError(f'unknown type: {play["type"]}')
+            return amount_for_tragedy(perf)
+        if play["type"] == "comedy":
+            return amount_for_comedy(perf)
+        raise ValueError(f'unknown type: {play["type"]}')
+
+    for perf in invoice["performances"]:
+        play = plays[perf["playID"]]
+        this_amount = amount_for_performance(perf)
 
         volume_credits += max(perf["audience"] - 30, 0)
         if "comedy" == play["type"]:
