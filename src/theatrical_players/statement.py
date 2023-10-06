@@ -41,9 +41,8 @@ def statement(invoice, plays):
 
     for perf in invoice["performances"]:
         play = plays[perf["playID"]]
-        this_amount = amount_for_performance(perf)
-        result += f' {play["name"]}: {format_as_dollars(this_amount/100)} ({perf["audience"]} seats)\n'
-        total_amount += this_amount
+        result += f' {play["name"]}: {format_as_dollars(amount_for_performance(perf)/100)} ({perf["audience"]} seats)\n'
+        total_amount += amount_for_performance(perf)
 
     result += f"Amount owed is {format_as_dollars(total_amount/100)}\n"
     result += f"You earned {volume_credits_for_performances()} credits\n"
