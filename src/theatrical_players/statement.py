@@ -48,13 +48,17 @@ def amount_for_performances(performances, plays) -> float:
     return sum(amount_for_performance(perf, plays) for perf in performances)
 
 
+def statement_for_performance(perf, plays) -> str:
+    play = get_play_for_performance(perf, plays)
+    return f' {play["name"]}: {format_as_dollars(amount_for_performance(perf, plays)/100)} ({perf["audience"]} seats)\n'
+
+
 def statement(invoice, plays):
     result = f'Statement for {invoice["customer"]}\n'
     performances = invoice["performances"]
 
     for perf in performances:
-        play = plays[perf["playID"]]
-        result += f' {play["name"]}: {format_as_dollars(amount_for_performance(perf, plays)/100)} ({perf["audience"]} seats)\n'
+        result += statement_for_performance(perf, plays)
 
     result += f"Amount owed is {format_as_dollars(amount_for_performances(performances, plays)/100)}\n"
     result += f"You earned {volume_credits_for_performances(performances, plays)} credits\n"
